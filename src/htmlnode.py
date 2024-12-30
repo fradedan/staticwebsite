@@ -15,7 +15,15 @@ class HTMLNODE:
         return output
     
     def __repr__(self):
-        return f'tag = {self.tag}\nvalue = {self.value}\nchildren = {self.children}\nprops = {self.props}'
+        if not self.children and not self.props:
+            return f'tag = {self.tag}\nvalue = {self.value}'
+
+        if not self.children:
+            return f'tag = {self.tag}\nvalue = {self.value}\nprops = {self.props}'
+        
+        else:
+
+            return f'tag = {self.tag}\nvalue = {self.value}\nchildren = {self.children}\nprops = {self.props}'
 
 
 
@@ -56,5 +64,4 @@ class ParentNode(HTMLNODE):
     
 
        
-
 
