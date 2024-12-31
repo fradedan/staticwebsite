@@ -15,10 +15,10 @@ def text_node_to_html_node(text_node):
         case TextType.CODE:
             new_type= LeafNode("code",text_node.text)
             return new_type
-        case TextType.LINKS:
+        case TextType.LINK:
             new_type= LeafNode("a",text_node.text,{'href' : text_node.url})
             return new_type
-        case TextType.IMAGES:
+        case TextType.IMAGE:
             new_type= LeafNode("img","",{'src' : text_node.url, 'alt': text_node.text})
             return new_type
         case _:

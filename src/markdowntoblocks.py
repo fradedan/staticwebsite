@@ -1,5 +1,11 @@
 import re
 
+def text_import(path):
+    with open(path)as f:
+        return f.read()    
+
+file_path = "src/content/text.txt"
+text = text_import(file_path)
 
 def markdown_to_blocks(markdown):
 
@@ -12,6 +18,24 @@ def markdown_to_blocks(markdown):
             output_list.append(stripped)   
 
     return output_list
+
+def wrapped_line_consolidation(blocks):
+    new_block = []
+    for block in blocks:        
+        lines = block.split('\n')
+        for i, line in enumerate(lines):
+            pattern = r'^(\s{3,})(.+)'
+            match = re.match(pattern,line)
+            if match:
+                line = match.group(2)
+                lines[i-1] = lines[i-1]+ " "+ line
+                del lines[i]
+            
+        new_block.append("\n".join(lines))
+
+    return new_block
+        
+
 
 def block_to_block_type(block):
     lines = block.split('\n')
@@ -30,14 +54,12 @@ def block_to_block_type(block):
                     line_starts_with_delimiter=True
             return line_starts_with_delimiter
 
-    def check_ordered_list(block):                              #check ordered list
-            nonlocal lines
-            if block[0].isdigit():
-                offset = int(block[0])-1
-                for i, line in enumerate(lines):
-                    if not re.match(f'^{i+1+offset}\.', line):
-                        return False
-                return True
+    def check_ordered_list():                              #check ordered list
+            nonlocal lines            
+            for line in lines:
+                if not re.match(r'^\d+\.\s+',line):
+                    return False
+            return True
     
     def check_heading():
         nonlocal lines
@@ -59,7 +81,7 @@ def block_to_block_type(block):
         return "Unordered"
     
     
-    if check_ordered_list(block):                               #confirm ordered list
+    if check_ordered_list():                               #confirm ordered list
         return "Ordered"
     
     else:
