@@ -7,11 +7,12 @@ from textnodetohtlmnode import text_node_to_html_node
 
 
 def markdown_to_html(text):
-    blocks = wrapped_line_consolidation(markdown_to_blocks(text))
+    blocks = wrapped_line_consolidation(markdown_to_blocks(text))    
+    
     parent_nodes = []
     created_node = []
     for block in blocks:    
-        block_type = block_to_block_type(block)   
+        block_type = block_to_block_type(block)           
         
 
         ### case for Heading type ###
@@ -32,6 +33,7 @@ def markdown_to_html(text):
 
         ### case for Paragraph type ###
         if block_type == "Paragraph":
+            
             child_nodes = []
             text_node = text_to_textnodes(block)
             for node in text_node:
@@ -55,6 +57,7 @@ def markdown_to_html(text):
 
         ### case for unordered list ###
         if block_type == "Unordered":
+            
             list_child_nodes = []        
             lines= block.split('\n')
             for line in lines:
@@ -89,12 +92,15 @@ def markdown_to_html(text):
 
         ### case for Quote ###
         if block_type == "Quote":
-            lines = lines= block.split('\n')
-            pattern = r'(\>s*)(.+)'
-            for line in lines:
+            child_nodes = []
+            lines = block.split('\n')
+            pattern = r'^(\>\s*)(.+)'
+            for i, line in enumerate(lines):
                 match = re.match(pattern,line)
                 if match :
                     line = match.group(2)
+                    lines[i] = line
+
             quote_content = "\n".join(lines)
 
             text_node = text_to_textnodes(quote_content)
@@ -108,10 +114,17 @@ def markdown_to_html(text):
     created_node= ParentNode('div',parent_nodes)
     return created_node.to_html()
 
-  
 
+def extract_title(markdown):
+    blocks = wrapped_line_consolidation(markdown_to_blocks(markdown))
+    for block in blocks:
+        
+        block_type = block_to_block_type(block)
+        if block_type == "Heading":
+            pattern = r'^(#(?!#)\s+)(.+)'
+            match= re.match(pattern,block)
+            if match:
+                return (match.group(2))
         
 
-
-        
 

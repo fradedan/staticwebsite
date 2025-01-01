@@ -1,11 +1,5 @@
 import re
 
-def text_import(path):
-    with open(path)as f:
-        return f.read()    
-
-file_path = "src/content/text.txt"
-text = text_import(file_path)
 
 def markdown_to_blocks(markdown):
 
@@ -16,7 +10,7 @@ def markdown_to_blocks(markdown):
         stripped = element.strip()
         if stripped != "":
             output_list.append(stripped)   
-
+    
     return output_list
 
 def wrapped_line_consolidation(blocks):
@@ -32,7 +26,7 @@ def wrapped_line_consolidation(blocks):
                 del lines[i]
             
         new_block.append("\n".join(lines))
-
+        
     return new_block
         
 
@@ -40,19 +34,30 @@ def wrapped_line_consolidation(blocks):
 def block_to_block_type(block):
     lines = block.split('\n')
 
-    def check_every_line(block,delimiter,delimiter2= None):                      #check every line function
-        if delimiter2== None:
-            delimiter2= delimiter
+    def check_unordered_list(block):
+        nonlocal lines
+        pattern1 = r'^\*\s+'
+        pattern2 = r'^\-\s+'
+        block_check=True
+        for line in lines:
+            match1 = re.match(pattern1,line)
+            match2 = re.match(pattern2,line)
+            if not match1 and not match2 :
+                block_check=False  
+        return block_check
 
-        if block.startswith(delimiter)or block.startswith(delimiter2):                             
-            nonlocal lines
-            line_starts_with_delimiter = True
-            for item in lines:
-                if not item.startswith(delimiter)and not item.startswith(delimiter2):
-                    line_starts_with_delimiter= False       
-                else:
-                    line_starts_with_delimiter=True
-            return line_starts_with_delimiter
+
+    def check_block_quote():
+        pattern = r'^\>{1}\s*'
+        
+        block_check = True
+        for line in lines:
+            match = re.match(pattern,line)
+            if not match :
+                block_check=False            
+        
+        return block_check
+
 
     def check_ordered_list():                              #check ordered list
             nonlocal lines            
@@ -74,10 +79,10 @@ def block_to_block_type(block):
     if check_heading():
         return "Heading"  
     
-    if check_every_line(block,'>'):                             #check quote
+    if check_block_quote():                             #check quote
         return "Quote"
     
-    if check_every_line(block,'*','-'):                             #check unordered list 
+    if check_unordered_list(block):                             #check unordered list 
         return "Unordered"
     
     
